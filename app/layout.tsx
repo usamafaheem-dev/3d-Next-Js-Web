@@ -1,0 +1,33 @@
+import type { Metadata } from "next";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Nexus | Digital Agency",
+  description: "Award-winning digital experiences.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      className={`${inter.variable} ${jakarta.variable} h-full antialiased dark`}
+    >
+      <body className="min-h-full bg-[#050505] text-[#ededed] flex flex-col font-sans selection:bg-white/20">{children}</body>
+    </html>
+  );
+}
