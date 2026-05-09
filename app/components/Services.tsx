@@ -24,8 +24,8 @@ export default function Services() {
                 </span>
             </div>
             <motion.h2 
-              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-white mb-6 tracking-tight max-w-2xl"
@@ -78,8 +78,8 @@ export default function Services() {
               return (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, ...dir, filter: "blur(5px)" }}
-                  whileInView={{ opacity: 1, x: 0, y: 0, filter: "blur(0px)" }}
+                  initial={{ opacity: 0, ...dir }}
+                  whileInView={{ opacity: 1, x: 0, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ 
                     duration: 0.7, 

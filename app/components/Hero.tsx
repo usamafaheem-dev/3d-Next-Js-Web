@@ -7,35 +7,53 @@ import { useEffect, useRef, useState } from "react";
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [images, setImages] = useState<HTMLImageElement[]>([]);
+  const [images, setImages] = useState<{ [key: number]: HTMLImageElement }>({});
   const [currentFrame, setCurrentFrame] = useState(1);
   const [loadProgress, setLoadProgress] = useState(0);
   const totalFrames = 235;
 
-  // Optimized Canvas-based Preloading System
+  // Progressive Smart Loader: Loads sparse frames first for immediate interaction
   useEffect(() => {
     let loadedCount = 0;
-    const loadedImages: HTMLImageElement[] = [];
+    const tempImages: { [key: number]: HTMLImageElement } = {};
 
-    const preloadImages = async () => {
-      for (let i = 1; i <= totalFrames; i++) {
-        const img = new Image();
-        const frameHash = i.toString().padStart(3, '0');
-        img.src = `/hero-frames/ezgif-frame-${frameHash}.png`;
-        
-        img.onload = () => {
-          loadedCount++;
-          setLoadProgress(Math.floor((loadedCount / totalFrames) * 100));
-          if (loadedCount === totalFrames) {
-            // All loaded
-          }
-        };
-        loadedImages[i] = img;
-      }
-      setImages(loadedImages);
+    const loadImages = async () => {
+      // Phase 1: Rapid Sparse Load (Every 10th frame) for immediate scroll feel
+      const sparseIndices = [];
+      for (let i = 1; i <= totalFrames; i += 10) sparseIndices.push(i);
+      
+      // Phase 2: Full Fill (Fill the gaps)
+      const allIndices = Array.from({ length: totalFrames }, (_, i) => i + 1);
+      const remainingIndices = allIndices.filter(i => !sparseIndices.includes(i));
+      
+      const loadBatch = async (indices: number[]) => {
+        for (const i of indices) {
+          const img = new Image();
+          const frameHash = i.toString().padStart(3, '0');
+          img.src = `/hero-frames/ezgif-frame-${frameHash}.png`;
+          
+          await new Promise((resolve) => {
+            img.onload = () => {
+              loadedCount++;
+              setLoadProgress(Math.floor((loadedCount / totalFrames) * 100));
+              tempImages[i] = img;
+              setImages(prev => ({ ...prev, [i]: img }));
+              resolve(true);
+            };
+            img.onerror = resolve;
+          });
+          
+          // Yield to main thread
+          if (loadedCount % 5 === 0) await new Promise(r => setTimeout(r, 0));
+        }
+      };
+
+      // Load sparse first, then the rest
+      await loadBatch(sparseIndices);
+      loadBatch(remainingIndices);
     };
 
-    preloadImages();
+    loadImages();
   }, []);
 
   // Track the scroll progress precisely for this large container
@@ -53,12 +71,24 @@ export default function Hero() {
 
   // Draw to Canvas on frame change with high fidelity
   useEffect(() => {
-    if (images[currentFrame] && canvasRef.current) {
+    // Optimization: Find the nearest loaded frame to show something immediately 
+    // instead of waiting for a 100% specific frame.
+    const findNearestFrame = (target: number) => {
+      const keys = Object.keys(images).map(Number);
+      if (keys.length === 0) return null;
+      // Find closest key that is <= target
+      return keys.reduce((prev, curr) => 
+        (curr <= target && curr > prev) ? curr : prev, keys[0]
+      );
+    };
+
+    const nearestFrame = findNearestFrame(currentFrame);
+    
+    if (nearestFrame && images[nearestFrame] && canvasRef.current) {
       const canvas = canvasRef.current;
       const context = canvas.getContext("2d", { alpha: false });
       if (context) {
-        // High fidelity drawing
-        const img = images[currentFrame];
+        const img = images[nearestFrame];
         
         // Handle aspect ratio cover logic manually for canvas
         const canvasAspect = canvas.width / canvas.height;
@@ -96,7 +126,7 @@ export default function Hero() {
   }, []);
 
   return (
-    // Much larger container (300vh) guarantees the hero section hangs around long enough
+    // Much larger container (350vh)
     <section id="home" ref={containerRef} className="relative w-full h-[350vh] bg-[#05050a]">
       
       {/* Strictly sticky layout locks the hero view in place while we scroll through the huge area */}
@@ -142,15 +172,15 @@ export default function Hero() {
           <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-[#05050a] to-transparent z-10 pointer-events-none" />
           
           {/* Fallback floating purple particles */}
-          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#9b2cfa]/10 blur-[100px] rounded-full z-0 mix-blend-screen pointer-events-none" />
-          <div className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-[#3a7bfd]/10 blur-[100px] rounded-full z-0 mix-blend-screen pointer-events-none" />
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#9b2cfa]/5 blur-[80px] rounded-full z-0 mix-blend-screen pointer-events-none" />
+          <div className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-[#3a7bfd]/5 blur-[80px] rounded-full z-0 mix-blend-screen pointer-events-none" />
         </div>
 
         <div className="w-full max-w-7xl mx-auto px-8 relative z-20 flex flex-col justify-center h-full pt-20 pointer-events-auto">
           <div className="max-w-2xl relative z-30">
             <motion.div 
-              initial={{ opacity: 0, y: 15, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, ease: "easeOut" }}
               className="flex items-center gap-3 mb-6"
             >
@@ -161,8 +191,8 @@ export default function Hero() {
             </motion.div>
             
             <motion.h1 
-              initial={{ opacity: 0, y: 40, filter: "blur(12px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
               className="text-[40px] sm:text-6xl md:text-7xl lg:text-[85px] font-bold font-heading text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/50 leading-[1.05] mb-6 tracking-tight drop-shadow-sm"
             >
@@ -171,8 +201,8 @@ export default function Hero() {
             </motion.h1>
             
             <motion.p 
-              initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
               className="text-white/60 text-lg md:text-[17px] font-light max-w-lg mb-10 leading-relaxed"
             >

@@ -70,8 +70,8 @@ export default function TechStack() {
              </span>
           </motion.div>
           <motion.h2 
-             initial={{ opacity: 0, y: 40, filter: "blur(15px)" }}
-             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+             initial={{ opacity: 0, y: 30 }}
+             whileInView={{ opacity: 1, y: 0 }}
              viewport={{ once: true }}
              transition={{ duration: 1, ease: "easeOut" }}
              className="text-[28px] sm:text-5xl md:text-7xl font-bold mb-6 md:mb-8 font-heading text-white tracking-tighter leading-tight"
