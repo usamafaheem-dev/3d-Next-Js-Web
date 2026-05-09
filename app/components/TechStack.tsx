@@ -8,7 +8,25 @@ import { useInView } from "react-intersection-observer";
 // Optimized Spline Loader with Viewport Awareness
 const Spline = dynamic(() => import('@splinetool/react-spline'), { 
   ssr: false,
-  loading: () => <div className="absolute inset-0 flex items-center justify-center text-white/20 text-[10px] tracking-widest font-mono">LOADING 3D ENGINE...</div>
+  loading: () => (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#05050a]/40 backdrop-blur-sm z-50">
+      <div className="relative">
+        <div className="w-24 h-24 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin" />
+        <div className="absolute inset-0 w-24 h-24 rounded-full bg-blue-500/10 animate-pulse scale-150" />
+      </div>
+      <div className="mt-8 flex flex-col items-center gap-2">
+        <span className="text-[10px] tracking-[0.4em] font-bold text-white/40 uppercase animate-pulse">Initializing Neural Core</span>
+        <div className="w-32 h-1 bg-white/5 rounded-full overflow-hidden">
+          <motion.div 
+            initial={{ width: "0%" }}
+            animate={{ width: "100%" }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="h-full bg-gradient-brand shadow-[0_0_10px_#3a7bfd]"
+          />
+        </div>
+      </div>
+    </div>
+  )
 });
 
 const TechBadge = ({ label, icon: Icon, position }: { label: string, icon: any, position: string }) => (

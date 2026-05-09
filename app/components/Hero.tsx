@@ -6,15 +6,36 @@ import { useEffect, useRef, useState } from "react";
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [currentFrame, setCurrentFrame] = useState(1);
+  const [loadProgress, setLoadProgress] = useState(0);
+  const totalFrames = 235;
 
-  // Safely preload images in background to avoid flicker when swapping
+  // Optimized Canvas-based Preloading System
   useEffect(() => {
-    for (let i = 1; i <= 235; i++) {
-      const img = new Image();
-      const frameNumber = i.toString().padStart(3, '0');
-      img.src = `/hero-frames/ezgif-frame-${frameNumber}.png`;
-    }
+    let loadedCount = 0;
+    const loadedImages: HTMLImageElement[] = [];
+
+    const preloadImages = async () => {
+      for (let i = 1; i <= totalFrames; i++) {
+        const img = new Image();
+        const frameHash = i.toString().padStart(3, '0');
+        img.src = `/hero-frames/ezgif-frame-${frameHash}.png`;
+        
+        img.onload = () => {
+          loadedCount++;
+          setLoadProgress(Math.floor((loadedCount / totalFrames) * 100));
+          if (loadedCount === totalFrames) {
+            // All loaded
+          }
+        };
+        loadedImages[i] = img;
+      }
+      setImages(loadedImages);
+    };
+
+    preloadImages();
   }, []);
 
   // Track the scroll progress precisely for this large container
@@ -25,33 +46,97 @@ export default function Hero() {
 
   // Calculate the exact frame based on explicit float offsets
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    // 'latest' goes exactly 0.0 to 1.0. We map this strictly to frames 1 to 235
-    const frame = Math.round(latest * 234) + 1; 
-    const clampedFrame = Math.max(1, Math.min(235, frame));
+    const frame = Math.round(latest * (totalFrames - 1)) + 1; 
+    const clampedFrame = Math.max(1, Math.min(totalFrames, frame));
     setCurrentFrame(clampedFrame);
   });
 
-  const frameHash = currentFrame.toString().padStart(3, '0');
+  // Draw to Canvas on frame change with high fidelity
+  useEffect(() => {
+    if (images[currentFrame] && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d", { alpha: false });
+      if (context) {
+        // High fidelity drawing
+        const img = images[currentFrame];
+        
+        // Handle aspect ratio cover logic manually for canvas
+        const canvasAspect = canvas.width / canvas.height;
+        const imgAspect = img.width / img.height;
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (canvasAspect > imgAspect) {
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / imgAspect;
+          offsetX = 0;
+          offsetY = (canvas.height - drawHeight) / 2;
+        } else {
+          drawWidth = canvas.height * imgAspect;
+          drawHeight = canvas.height;
+          offsetX = (canvas.width - drawWidth) / 2;
+          offsetY = 0;
+        }
+
+        context.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+      }
+    }
+  }, [currentFrame, images]);
+
+  // Handle Resize for Canvas
+  useEffect(() => {
+    const handleResize = () => {
+      if (canvasRef.current) {
+        canvasRef.current.width = window.innerWidth;
+        canvasRef.current.height = window.innerHeight;
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
-    // Much larger container (600vh) guarantees the hero section hangs around long enough to gently show all 235 frames
-    <section id="home" ref={containerRef} className="relative w-full h-[300vh] bg-[#05050a]">
+    // Much larger container (300vh) guarantees the hero section hangs around long enough
+    <section id="home" ref={containerRef} className="relative w-full h-[350vh] bg-[#05050a]">
       
       {/* Strictly sticky layout locks the hero view in place while we scroll through the huge area */}
-      <div className="sticky top-0 w-full h-screen min-h-[850px] flex items-center justify-center overflow-hidden border-b border-white/[0.03]">
+      <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden border-b border-white/[0.03]">
         
         {/* Absolute Background Wrapper */}
         <div className="absolute inset-0 z-0 bg-[#05050a]">
           
-          {/* Robust Image Tag seamlessly swapping sources natively handles drawing logic perfectly */}
-          <img 
-            src={`/hero-frames/ezgif-frame-${frameHash}.png`}
-            alt="Hero Sequence Animation"
+          {/* High Performance Canvas Renderer */}
+          <canvas 
+            ref={canvasRef}
             className="absolute inset-0 w-full h-full object-cover z-0"
           />
 
+          {/* Fallback frame while loading */}
+          {loadProgress < 5 && (
+            <img 
+               src="/hero-frames/ezgif-frame-001.png" 
+               className="absolute inset-0 w-full h-full object-cover z-0"
+               alt="Hero Fallback"
+            />
+          )}
+
+          {/* Loading Indicator for Production Slowness */}
+          {loadProgress < 100 && (
+             <div className="absolute bottom-8 right-8 z-50 flex items-center gap-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+                <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-blue-500 transition-all duration-300" 
+                    style={{ width: `${loadProgress}%` }}
+                  />
+                </div>
+                <span className="text-[10px] font-mono text-white/50 tracking-widest uppercase">
+                  BUFFERING ASSETS: {loadProgress}%
+                </span>
+             </div>
+          )}
+
           {/* Left deep dark fade text container legibility */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#05050a]/90 via-[#05050a]/40 to-transparent z-10 w-full md:w-[65%] pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#05050a]/95 via-[#05050a]/40 to-transparent z-10 w-full md:w-[70%] pointer-events-none" />
           
           {/* Bottom dark fade */}
           <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-[#05050a] to-transparent z-10 pointer-events-none" />
