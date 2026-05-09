@@ -73,3 +73,25 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
 }
+
+/* Performance Optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1000px;
+}
+
+#home {
+  content-visibility: visible;
+}
+
+canvas, .spline-container {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}

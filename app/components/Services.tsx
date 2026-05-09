@@ -24,9 +24,10 @@ export default function Services() {
                 </span>
             </div>
             <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-white mb-6 tracking-tight max-w-2xl"
             >
               Enterprise-Grade <br/>
@@ -34,9 +35,15 @@ export default function Services() {
             </motion.h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
           
-          <div className="lg:col-span-1">
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="lg:col-span-1"
+          >
              <GlowCard glowColor="purple" customSize className="w-full h-full bg-[#05050a]/60 flex flex-col justify-between group relative overflow-hidden p-8">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#3a7bfd]/5 to-[#9b2cfa]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
@@ -55,30 +62,45 @@ export default function Services() {
                    </div>
                 </div>
              </GlowCard>
-          </div>
+          </motion.div>
 
           <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {services.slice(1).map((service, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <GlowCard glowColor={service.color} customSize className="flex flex-col h-full bg-[#05050a]/60 p-8 group">
-                  <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 group-hover:text-white transition-colors mb-6 glass-panel">
-                    <service.icon className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-3">
-                    {service.title}
-                  </h3>
-                  <p className="text-sm text-white/40 leading-relaxed">
-                    {service.desc}
-                  </p>
-                </GlowCard>
-              </motion.div>
-            ))}
+            {services.slice(1).map((service, i) => {
+              // Direction logic: Top, Bottom, Right, Bottom-Right
+              const directions = [
+                { x: 0, y: -40 }, // Top
+                { x: 50, y: 0 },  // Right
+                { x: 0, y: 40 },  // Bottom
+                { x: 50, y: 50 }, // Bottom Right
+              ];
+              const dir = directions[i % directions.length];
+
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, ...dir, filter: "blur(5px)" }}
+                  whileInView={{ opacity: 1, x: 0, y: 0, filter: "blur(0px)" }}
+                  viewport={{ once: true }}
+                  transition={{ 
+                    duration: 0.7, 
+                    delay: i * 0.15,
+                    ease: [0.21, 0.47, 0.32, 0.98] 
+                  }}
+                >
+                  <GlowCard glowColor={service.color} customSize className="flex flex-col h-full bg-[#05050a]/60 p-8 group transition-all duration-300 hover:bg-[#05050a]/80">
+                    <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 group-hover:text-white transition-colors mb-6 glass-panel">
+                      <service.icon className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-3">
+                      {service.title}
+                    </h3>
+                    <p className="text-sm text-white/40 leading-relaxed">
+                      {service.desc}
+                    </p>
+                  </GlowCard>
+                </motion.div>
+              );
+            })}
           </div>
 
         </div>

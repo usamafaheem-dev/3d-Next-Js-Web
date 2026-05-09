@@ -51,10 +51,10 @@ export default function About() {
               </div>
               
               <motion.h2 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 1, ease: "easeOut" }}
                 className="text-[32px] sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] font-heading text-white mb-6 tracking-tight"
               >
                 Pioneering the <br />
@@ -62,10 +62,10 @@ export default function About() {
               </motion.h2>
 
               <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.1 }}
+                transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
                 className="text-white/60 text-lg leading-relaxed font-light"
               >
                 By blending machine learning protocols with stunning visual fidelity, we engineer digital ecosystems that adapt, scale, and outperform traditional systems at every constraint.
@@ -74,10 +74,10 @@ export default function About() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -30, filter: "blur(5px)" }}
+                whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
                 className="flex flex-col gap-4 p-6 glass-panel rounded-2xl border-white/[0.04]"
               >
                 <div className="text-3xl font-bold font-heading text-white">40%</div>
@@ -88,10 +88,10 @@ export default function About() {
               </motion.div>
               
                <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: 30, filter: "blur(5px)" }}
+                whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.3 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
                 className="flex flex-col gap-4 p-6 bg-gradient-brand rounded-2xl relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-2xl rounded-full mix-blend-overlay" />

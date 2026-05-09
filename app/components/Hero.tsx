@@ -64,9 +64,9 @@ export default function Hero() {
         <div className="w-full max-w-7xl mx-auto px-8 relative z-20 flex flex-col justify-center h-full pt-20 pointer-events-auto">
           <div className="max-w-2xl relative z-30">
             <motion.div 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              initial={{ opacity: 0, y: 15, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 1, ease: "easeOut" }}
               className="flex items-center gap-3 mb-6"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-[#3a7bfd] shadow-[0_0_10px_#3a7bfd]" />
@@ -76,9 +76,9 @@ export default function Hero() {
             </motion.div>
             
             <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+              initial={{ opacity: 0, y: 40, filter: "blur(12px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 1.2, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
               className="text-[40px] sm:text-6xl md:text-7xl lg:text-[85px] font-bold font-heading text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/50 leading-[1.05] mb-6 tracking-tight drop-shadow-sm"
             >
               Intelligence <br />
@@ -86,9 +86,9 @@ export default function Hero() {
             </motion.h1>
             
             <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
               className="text-white/60 text-lg md:text-[17px] font-light max-w-lg mb-10 leading-relaxed"
             >
               We build next-generation AI solutions that automate, innovate and accelerate the way businesses grow in the digital era.
