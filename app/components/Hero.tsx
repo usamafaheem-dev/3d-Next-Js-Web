@@ -19,7 +19,7 @@ export default function Hero() {
 
     const loadImages = async () => {
       // Phase 1: Rapid Sparse Load (Every 10th frame) for immediate scroll feel
-      const sparseIndices = [];
+      const sparseIndices: number[] = [];
       for (let i = 1; i <= totalFrames; i += 10) sparseIndices.push(i);
 
       // Phase 2: Full Fill (Fill the gaps)
