@@ -55,6 +55,9 @@ next-env.d.ts
 Thumb.db
 db.json
 
+# Large assets
+public/*.zip
+
 # Local agent files
 .gemini/
 .agents/
